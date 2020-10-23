@@ -15,13 +15,12 @@ export default class IfController extends Controller {
   constructor(options = DEFAULT_OPTIONS) {
     super(options);
 
-    this.condition = this.initStringProp(this.props, 'IfController.condition');
-    this.evaluateAll = this.initBoolProp(this.props, 'IfController.evaluateAll');
-    this.useExpression = this.initBoolProp(this.props, 'IfController.useExpression', true);
+    this.condition = this.initStringProp('IfController.condition');
+    this.evaluateAll = this.initBoolProp('IfController.evaluateAll');
+    this.useExpression = this.initBoolProp('IfController.useExpression', true);
   }
 }
 
 export const schema = {
-  name: "IfController",
-  class: IfController
+  IfController: IfController
 }

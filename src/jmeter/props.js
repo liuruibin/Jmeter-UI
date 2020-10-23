@@ -20,19 +20,15 @@ export class BasicProp extends Prop {
     }
   }
 
-  set(value = "") {
-    this.value = value;
-  }
-
   toJson() {
-    let json = super.toJson();
     if (this.value !== undefined) {
+      let json = super.toJson();
       json.elements = [{
         "type": "text",
         "text": "" + this.value
       }]
+      return json;
     }
-    return json;
   }
 }
 
@@ -52,9 +48,9 @@ export class IntProp extends BasicProp {
  * value:数值
  */
 export class LongProp extends BasicProp {
-    name = "longProp";
+  name = "longProp";
 
-    constructor(options = {}) {
+  constructor(options = {}) {
     super(options);
     this.value = options.elements ? parseInt(options.elements[0].text) : undefined;
   }
@@ -64,9 +60,9 @@ export class LongProp extends BasicProp {
  * value:布尔
  */
 class BoolProp extends BasicProp {
-    name = "boolProp";
+  name = "boolProp";
 
-    constructor(options = {}) {
+  constructor(options = {}) {
     super(options);
     this.value = options.elements ? options.elements[0].text === 'true' : undefined;
   }
@@ -76,9 +72,9 @@ class BoolProp extends BasicProp {
  * value:字符串
  */
 export class StringProp extends BasicProp {
-    name = "stringProp";
+  name = "stringProp";
 
-    constructor(options = {}) {
+  constructor(options = {}) {
     super(options);
     this.value = options.elements ? options.elements[0].text : undefined;
   }
@@ -147,7 +143,25 @@ export class CollectionProp extends Prop {
     this.elements = [];
     if (options.elements) {
       options.elements.forEach(e => {
-        this.add(new ElementProp(e));
+        let prop;
+        switch (e.name) {
+          case "intProp":
+            prop = new IntProp(e);
+            break;
+          case "longProp":
+            prop = new LongProp(e);
+            break;
+          case "boolProp":
+            prop = new BoolProp(e);
+            break;
+          case "stringProp":
+            prop = new StringProp(e);
+            break;
+          case "elementProp":
+            prop = new ElementProp(e);
+            break;
+        }
+        this.add(prop);
       })
     }
   }
@@ -173,7 +187,10 @@ export class CollectionProp extends Prop {
     if (this.elements && this.elements.length > 0) {
       json.elements = [];
       this.elements.forEach(v => {
-        json.elements.push(v.toJson());
+        let element = v.toJson();
+        if (element !== undefined) {
+          json.elements.push(element);
+        }
       })
     }
     return json;
@@ -190,6 +207,41 @@ export class ElementProp extends Prop {
     if (options.elements) {
       this.elements = getProps(options.elements);
     }
+  }
+
+  initIntProp(name, defaultValue) {
+    if (this.elements[name] === undefined) {
+      this.elements[name] = intProp(name, defaultValue);
+    }
+    return this.elements[name];
+  }
+
+  initLongProp(name, defaultValue) {
+    if (this.elements[name] === undefined) {
+      this.elements[name] = longProp(name, defaultValue);
+    }
+    return this.elements[name];
+  }
+
+  initBoolProp(name, defaultValue) {
+    if (this.elements[name] === undefined) {
+      this.elements[name] = boolProp(name, defaultValue);
+    }
+    return this.elements[name];
+  }
+
+  initStringProp(name, defaultValue) {
+    if (this.elements[name] === undefined) {
+      this.elements[name] = stringProp(name, defaultValue);
+    }
+    return this.elements[name];
+  }
+
+  initCollectionProp(name) {
+    if (this.elements[name] === undefined) {
+      this.elements[name] = collectionProp(name);
+    }
+    return this.elements[name];
   }
 
   add(prop) {
@@ -210,7 +262,10 @@ export class ElementProp extends Prop {
     if (keys.length > 0) {
       json.elements = [];
       keys.forEach(key => {
-        json.elements.push(this.elements[key].toJson());
+        let element = this.elements[key].toJson();
+        if (element !== undefined) {
+          json.elements.push(element);
+        }
       });
     }
     return json;
@@ -257,18 +312,19 @@ export const getProps = function (elements) {
 
 export const basicProp = function (type, name, value) {
   let options = {
-    "type": "element",
-    "attributes": {
-      "name": name
-    },
-    "elements": [
+    type: "element",
+    attributes: {
+      name: name
+    }
+  }
+  if (value !== undefined) {
+    options.elements = [
       {
-        "type": "text",
-        "text": value === undefined ? "" : "" + value
+        type: "text",
+        text: "" + value
       }
     ]
   }
-
   return new type(options);
 }
 
@@ -300,13 +356,14 @@ export const collectionProp = function (name) {
   return new CollectionProp(options);
 }
 
-export const elementProp = function (name, elementType) {
+export const elementProp = function (name, elementType, attributes) {
   let options = {
     "type": "element",
     "name": "elementProp",
     "attributes": {
       "name": name,
-      "elementType": elementType
+      "elementType": elementType,
+      ...attributes
     },
     elements: []
   };

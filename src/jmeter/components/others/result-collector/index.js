@@ -11,21 +11,15 @@ const DEFAULT_OPTIONS = {
   }
 };
 
+export const TYPE = "ResultCollector";
+
 export default class ResultCollector extends HashTreeElement {
   constructor(options = DEFAULT_OPTIONS) {
     super(options);
-  }
-
-  allowDrag() {
-    return false;
-  }
-
-  allowDrop(dragging) {
-    return false;
+    this.$type = TYPE;
   }
 }
 
 export const schema = {
-  name: "ResultCollector",
-  class: ResultCollector
+  ResultCollector: ResultCollector
 }

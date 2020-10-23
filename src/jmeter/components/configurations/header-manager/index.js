@@ -17,10 +17,10 @@ export default class HeaderManager extends Configuration {
     super(options);
 
     this.headers = [];
-    let collectionProp = this.initCollectionProp(this.props, 'HeaderManager.headers');
+    let collectionProp = this.initCollectionProp('HeaderManager.headers');
     collectionProp.forEach(elementProp => {
-      let name = elementProp.elements['Header.name'].value;
-      let value = elementProp.elements['Header.value'].value;
+      let name = elementProp.initStringProp('Header.name').value;
+      let value = elementProp.initStringProp('Header.value').value;
       let header = {name: name, value: value, enable: true};
 
       this.headers.push(header);
@@ -47,6 +47,5 @@ export default class HeaderManager extends Configuration {
 }
 
 export const schema = {
-  name: "HeaderManager",
-  class: HeaderManager
+  HeaderManager: HeaderManager
 }

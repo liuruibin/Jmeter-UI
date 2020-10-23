@@ -6,7 +6,7 @@ export default class HashTreeElement extends Element {
   constructor({options: options, hashTree: hashTree}) {
     super(options);
     this.props = getProps(options.elements);
-    this.comments = this.initStringProp(this.props, 'TestPlan.comments');
+    this.comments = this.initStringProp('TestPlan.comments');
 
     if (hashTree) {
       this.hashTree = loadHashTree(hashTree);
@@ -18,54 +18,46 @@ export default class HashTreeElement extends Element {
     return loadComponent(json.options, json.hashTree);
   }
 
-  initIntProp(map, name, defaultValue) {
-    if (map[name] === undefined) {
-      map[name] = intProp(name, defaultValue);
+  initIntProp(name, defaultValue) {
+    if (this.props[name] === undefined) {
+      this.props[name] = intProp(name, defaultValue);
     }
-    return map[name];
+    return this.props[name];
   }
 
-  initLongProp(map, name, defaultValue) {
-    if (map[name] === undefined) {
-      map[name] = longProp(name, defaultValue);
+  initLongProp(name, defaultValue) {
+    if (this.props[name] === undefined) {
+      this.props[name] = longProp(name, defaultValue);
     }
-    return map[name];
+    return this.props[name];
   }
 
-  initBoolProp(map, name, defaultValue) {
-    if (map[name] === undefined) {
-      map[name] = boolProp(name, defaultValue);
+  initBoolProp(name, defaultValue) {
+    if (this.props[name] === undefined) {
+      this.props[name] = boolProp(name, defaultValue);
     }
-    return map[name];
+    return this.props[name];
   }
 
-  initStringProp(map, name, defaultValue) {
-    if (map[name] === undefined) {
-      map[name] = stringProp(name, defaultValue);
+  initStringProp(name, defaultValue) {
+    if (this.props[name] === undefined) {
+      this.props[name] = stringProp(name, defaultValue);
     }
-    return map[name];
+    return this.props[name];
   }
 
-  initElementProp(map, name, elementType) {
-    if (map[name] === undefined) {
-      map[name] = elementProp(name, elementType);
+  initElementProp(name, elementType) {
+    if (this.props[name] === undefined) {
+      this.props[name] = elementProp(name, elementType);
     }
-    return map[name];
+    return this.props[name];
   }
 
-  initCollectionProp(map, name) {
-    if (map[name] === undefined) {
-      map[name] = collectionProp(name);
+  initCollectionProp(name) {
+    if (this.props[name] === undefined) {
+      this.props[name] = collectionProp(name);
     }
-    return map[name];
-  }
-
-  allowDrag() {
-    return true;
-  }
-
-  allowDrop(dragging, drop, type) {
-    return dragging instanceof HashTreeElement;
+    return this.props[name];
   }
 
   toJson() {
@@ -73,7 +65,10 @@ export default class HashTreeElement extends Element {
     if (this.props !== undefined) {
       self.elements = [];
       Object.keys(this.props).forEach(key => {
-        self.elements.push(this.props[key].toJson());
+        let json = this.props[key].toJson();
+        if (json !== undefined) {
+          self.elements.push(json);
+        }
       });
     }
 
